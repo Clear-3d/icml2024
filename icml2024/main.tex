@@ -133,24 +133,35 @@
 % DMV3D
 
 \paragraph{Latent Diffusion Models.} 
+% LDMs包含了两个关键组件，一个自动编码器以及一个潜变量去噪网络。
+LDMs consist of two key components: an auto-encoder and a latent denoising network.
+% 其中，自动编码器可以建立原始数据，例如图像到一个相对低维潜变量的双向映射。
+the autoencoder can establish a bi-directional mapping from the space of the original data, such as high-resolution image space, to a low-dimensional latent space:
 %
-LDMs contains an auto-encoder and a denoising network.
-%
-
-
 \begin{equation}
-\tilde{x}=\mathcal{D}(z)=\mathcal{D}(E(x))
+z = E(x), \tilde{x} = D(z)
 \label{eq.1}
 \end{equation}
-
-
-
+%
+where $E$ and $D$ are the encoder and decoder, respectively. 
+%
+The latent denoising network $\epsilon_\theta$ aims to denoise noisy latent given timestep $t$ and condition $y$. 
+%
+Its training objective is defined as:
 \begin{equation}
 L:=\mathbb{E}_{
 \mathcal{E}(x),\epsilon\sim\mathcal{N}(0,1),t}
-\Big[\|\epsilon-\epsilon_\theta(z_t,y,t)\|_2^2\Big]
+\Big[\|\epsilon-\epsilon_\theta(z_t,y,t)\|_2^2\Big],
 \label{eq.2}
 \end{equation}
+%
+where the noisy latent is obtained by $z_t = E(x) + \epsilon$.
+
+During inference, we randomly sample $z_T \in \mathcal{N}(0,1)$. 
+%
+By continuously denoising $z_{t-1}=, t=T, T-1, \dots, 1$, we can obtain a latent satisfying condition $y$.
+%
+Then, we input the completely denoised latent $z_0$ into the decoder to get the high-resolution image $x = E(z_0)$.
 
 \begin{equation}
 L:=\mathbb{E}_{
